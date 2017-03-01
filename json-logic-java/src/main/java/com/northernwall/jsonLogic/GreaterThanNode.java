@@ -28,7 +28,7 @@ class GreaterThanNode extends BinaryNode {
     }
 
     @Override
-    Result eval(Map<String, Result> data) {
+    Result eval(Map<String, Result> data) throws EvaluationException {
         Result leftResult = left.eval(data);
         Result rightResult = right.eval(data);
         if (leftResult.isLong() && rightResult.isLong()) {

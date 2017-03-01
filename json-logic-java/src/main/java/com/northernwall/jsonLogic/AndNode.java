@@ -28,13 +28,13 @@ class AndNode extends BinaryNode {
     }
 
     @Override
-    Result eval(Map<String, Result> data) {
+    Result eval(Map<String, Result> data) throws EvaluationException {
         Result leftResult = left.eval(data);
         Result rightResult = right.eval(data);
         if (leftResult.isBoolean() && rightResult.isBoolean()) {
             return new Result(leftResult.getBooleanValue() && rightResult.getBooleanValue());
         }
-        return null;
+        throw new EvaluationException("Both sides of an AND must be resolve to booleans");
     }
 
 }

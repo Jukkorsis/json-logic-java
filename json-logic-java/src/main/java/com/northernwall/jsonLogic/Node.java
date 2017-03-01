@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public abstract class Node {
 
-    abstract Result eval(Map<String, Result> data);
+    abstract Result eval(Map<String, Result> data) throws EvaluationException;
     
     /**
      * If the result of calling eval is always the same regardless of the data parameter then this node is a constant.
@@ -34,7 +34,7 @@ public abstract class Node {
     /**
      * reduce() should only be called if isContant() returns false
      */
-    void reduce() {
+    void reduce() throws EvaluationException {
     }
 
     abstract void treeToString(StringBuilder builder);

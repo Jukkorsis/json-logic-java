@@ -44,11 +44,11 @@ public class JsonLogicTree {
      * @param data
      * @return
      */
-    public Result evaluate(String data) {
+    public Result evaluate(String data) throws ParseException, EvaluationException {
         return node.eval(convertData(data));
     }
 
-    private Map<String, Result> convertData(String data) {
+    private Map<String, Result> convertData(String data) throws ParseException {
         Map<String, Result> temp = new HashMap<>();
         if (data == null || data.isEmpty()) {
             return temp;
@@ -65,7 +65,7 @@ public class JsonLogicTree {
             }
             jsonReader.endObject();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return temp;
     }
@@ -98,7 +98,7 @@ public class JsonLogicTree {
      * This method tries to reduces the complexity of the tree by pruning
      * sub-trees that produce a constant value regardless of the value of data.
      */
-    public void reduce() {
+    public void reduce() throws EvaluationException {
         if (node.isConstant()) {
             node = new ConstantNode(node.eval(new HashMap<>()));
         } else {

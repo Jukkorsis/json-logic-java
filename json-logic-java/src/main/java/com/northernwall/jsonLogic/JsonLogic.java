@@ -39,8 +39,9 @@ public class JsonLogic {
      * @param rule
      * @param data
      * @return 
+     * @throws com.northernwall.jsonLogic.ParseException 
      */
-    public Result apply(String rule, String data) {
+    public Result apply(String rule, String data) throws ParseException, EvaluationException {
         return parse(rule).evaluate(data);
     }
 
@@ -48,12 +49,13 @@ public class JsonLogic {
      * Parses the rules into a reusable tree which can be evaluated many times.
      * @param rule
      * @return 
+     * @throws com.northernwall.jsonLogic.ParseException 
      */
-    public JsonLogicTree parse(String rule) {
+    public JsonLogicTree parse(String rule) throws ParseException {
         return new JsonLogicTree(parse(gson.newJsonReader(new StringReader(rule))), gson);
     }
     
-    private Node parse(JsonReader jsonReader) {
+    private Node parse(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -95,12 +97,12 @@ public class JsonLogic {
                     break;
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseEquals(JsonReader jsonReader) {
+    private Node parseEquals(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
 
@@ -111,12 +113,12 @@ public class JsonLogic {
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseGreaterThan(JsonReader jsonReader) {
+    private Node parseGreaterThan(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -126,12 +128,12 @@ public class JsonLogic {
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseLessThan(JsonReader jsonReader) {
+    private Node parseLessThan(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -141,12 +143,12 @@ public class JsonLogic {
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseAnd(JsonReader jsonReader) {
+    private Node parseAnd(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -156,12 +158,12 @@ public class JsonLogic {
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseOr(JsonReader jsonReader) {
+    private Node parseOr(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -171,12 +173,12 @@ public class JsonLogic {
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }
 
-    private Node parseVar(JsonReader jsonReader) {
+    private Node parseVar(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
@@ -184,15 +186,29 @@ public class JsonLogic {
                 jsonReader.beginArray();
                 String name = jsonReader.nextString();
                 token = jsonReader.peek();
-                if (token == JsonToken.END_ARRAY) {
-                    tree = new VarNode(name);
-                } else {
-                    //todo Process default value, second optional element in the array.
+                if (null != token) switch (token) {
+                    case END_ARRAY:
+                        tree = new VarNode(name);
+                        break;
+                    case NUMBER:
+                        tree = new VarNode(name, new Result(jsonReader.nextLong()));
+                        break;
+                    case STRING:
+                        tree = new VarNode(name, new Result(jsonReader.nextString()));
+                        break;
+                    case BOOLEAN:
+                        if (jsonReader.nextBoolean()) {
+                            tree = new VarNode(name, TRUE_RESULT);
+                        } else {
+                            tree = new VarNode(name, FALSE_RESULT);
+                        }   break;
+                    default:
+                        break;
                 }
                 jsonReader.endArray();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ParseException(ex.getMessage(), ex);
         }
         return tree;
     }

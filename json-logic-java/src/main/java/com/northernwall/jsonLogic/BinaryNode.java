@@ -20,7 +20,7 @@ package com.northernwall.jsonLogic;
  * @author Richard
  */
 abstract class BinaryNode extends Node {
-    
+
     protected Node left;
     protected Node right;
     private final String operator;
@@ -37,15 +37,18 @@ abstract class BinaryNode extends Node {
     }
 
     @Override
-    void reduce() {
-        if (left.isConstant() && !(left instanceof ConstantNode)) {
-            left = new ConstantNode(left.eval(null));
-        }
-        if (right.isConstant() && !(right instanceof ConstantNode)) {
-            right = new ConstantNode(right.eval(null));
+    void reduce() throws EvaluationException {
+        if (left.isConstant()) {
+            if (!(left instanceof ConstantNode)) {
+                left = new ConstantNode(left.eval(null));
+            }
+        } else if (right.isConstant()) {
+            if (!(right instanceof ConstantNode)) {
+                right = new ConstantNode(right.eval(null));
+            }
         }
     }
-    
+
     @Override
     void treeToString(StringBuilder builder) {
         builder.append("(");
@@ -54,5 +57,5 @@ abstract class BinaryNode extends Node {
         right.treeToString(builder);
         builder.append(")");
     }
-    
+
 }

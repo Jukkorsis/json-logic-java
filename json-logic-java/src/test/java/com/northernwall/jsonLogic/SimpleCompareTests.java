@@ -27,7 +27,7 @@ public class SimpleCompareTests extends BaseTest {
     }
 
     @Test
-    public void TestEqualsWithContants1() {
+    public void TestEqualsWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"==\" : [1, 1] }",
                 null,
@@ -37,7 +37,7 @@ public class SimpleCompareTests extends BaseTest {
     }
 
     @Test
-    public void TestEqualsWithContants2() {
+    public void TestEqualsWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"==\" : [1, 3] }",
                 null,
@@ -47,7 +47,7 @@ public class SimpleCompareTests extends BaseTest {
     }
 
     @Test
-    public void TestGreaterWithContants1() {
+    public void TestGreaterWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \">\" : [3, 1] }",
                 null,
@@ -57,7 +57,7 @@ public class SimpleCompareTests extends BaseTest {
     }
 
     @Test
-    public void TestGreaterWithContants2() {
+    public void TestGreaterWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \">\" : [1, 1] }",
                 null,
@@ -67,7 +67,7 @@ public class SimpleCompareTests extends BaseTest {
     }
 
     @Test
-    public void TestGreaterWithContants3() {
+    public void TestGreaterWithContants3() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \">\" : [1, 3] }",
                 null,

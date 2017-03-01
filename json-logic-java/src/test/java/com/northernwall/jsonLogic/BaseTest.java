@@ -23,7 +23,7 @@ import junit.framework.Assert;
  */
 public class BaseTest {
 
-    protected void TestRunner(String rule, String data, String printFull, String printReduced, boolean expectedResult) {
+    protected void TestRunner(String rule, String data, String printFull, String printReduced, boolean expectedResult) throws ParseException, EvaluationException {
         JsonLogic jsonLogic = new JsonLogic();
 
         Result result = jsonLogic.apply(rule, data);
@@ -43,7 +43,7 @@ public class BaseTest {
         Assert.assertEquals(expectedResult, result.getBooleanValue());
     }
 
-    protected void TestRunner(String rule, String data, String printFull, String printReduced, long expectedResult) {
+    protected void TestRunner(String rule, String data, String printFull, String printReduced, long expectedResult) throws ParseException, EvaluationException {
         JsonLogic jsonLogic = new JsonLogic();
 
         Result result = jsonLogic.apply(rule, data);
@@ -63,7 +63,7 @@ public class BaseTest {
         Assert.assertEquals(expectedResult, result.getLongValue());
     }
 
-    protected void TestRunner(String rule, String data, String printFull, String printReduced, String expectedResult) {
+    protected void TestRunner(String rule, String data, String printFull, String printReduced, String expectedResult) throws ParseException, EvaluationException {
         JsonLogic jsonLogic = new JsonLogic();
 
         Result result = jsonLogic.apply(rule, data);

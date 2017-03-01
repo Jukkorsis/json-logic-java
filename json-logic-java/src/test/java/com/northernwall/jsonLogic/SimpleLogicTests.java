@@ -27,7 +27,7 @@ public class SimpleLogicTests extends BaseTest {
     }
 
     @Test
-    public void TestAndWithContants1() {
+    public void TestAndWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"and\" : [true, true] }",
                 null,
@@ -37,7 +37,7 @@ public class SimpleLogicTests extends BaseTest {
     }
 
     @Test
-    public void TestAndWithContants2() {
+    public void TestAndWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"and\" : [true, false] }",
                 null,
@@ -47,7 +47,7 @@ public class SimpleLogicTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants1() {
+    public void TestOrWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"or\" : [true, true] }",
                 null,
@@ -57,7 +57,7 @@ public class SimpleLogicTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants2() {
+    public void TestOrWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"or\" : [true, false] }",
                 null,
@@ -67,7 +67,7 @@ public class SimpleLogicTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants3() {
+    public void TestOrWithContants3() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"or\" : [false, false] }",
                 null,

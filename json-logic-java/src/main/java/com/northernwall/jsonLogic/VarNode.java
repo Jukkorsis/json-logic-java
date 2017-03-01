@@ -23,15 +23,22 @@ import java.util.Map;
  */
 class VarNode extends Node {
     private final String name;
+    private final Result defaultResult;
 
     VarNode(String name) {
         this.name = name;
+        this.defaultResult = JsonLogic.FALSE_RESULT;
+    }
+
+    VarNode(String name, Result defaultResult) {
+        this.name = name;
+        this.defaultResult = defaultResult;
     }
 
     @Override
     Result eval(Map<String, Result> data) {
-        if (data == null || data.isEmpty()) {
-            return JsonLogic.FALSE_RESULT;
+        if (data == null || data.isEmpty() || !data.containsKey(name)) {
+            return defaultResult;
         }
         return data.get(name);
     }

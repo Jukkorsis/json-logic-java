@@ -27,7 +27,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestAndWithContants1() {
+    public void TestAndWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"and\" : [{\">\" : [3,1]}, {\"<\" : [1,3]}] }",
                 null,
@@ -37,7 +37,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestAndWithContants2() {
+    public void TestAndWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"and\" : [{\">\" : [4,5]}, {\"<\" : [1,3]}] }",
                 null,
@@ -47,7 +47,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestAndWithContants3() {
+    public void TestAndWithContants3() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"and\" : [{\">\" : [1,3]}, {\"<\" : [6,4]}] }",
                 null,
@@ -57,7 +57,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants1() {
+    public void TestOrWithContants1() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"or\" : [{\">\" : [3,1]}, {\"<\" : [1,3]}] }",
                 null,
@@ -67,7 +67,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants2() {
+    public void TestOrWithContants2() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"or\" : [{\">\" : [4,5]}, {\"<\" : [1,3]}] }",
                 null,
@@ -77,7 +77,7 @@ public class ComplexTests extends BaseTest {
     }
 
     @Test
-    public void TestOrWithContants3() {
+    public void TestOrWithContants3() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"or\" : [{\">\" : [2,7]}, {\"<\" : [6,4]}] }",
                 null,

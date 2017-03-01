@@ -27,7 +27,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarSimpleString() {
+    public void TestVarSimpleString() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"var\" : [\"a\"] }",
                 "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
@@ -37,7 +37,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarSimpleBoolean() {
+    public void TestVarSimpleBoolean() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"var\" : [\"b\"] }",
                 "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
@@ -47,7 +47,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarSimpleNumber() {
+    public void TestVarSimpleNumber() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"var\" : [\"c\"] }",
                 "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
@@ -57,7 +57,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarComplexString() {
+    public void TestVarComplexString() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"var\" : [\"champ.name\"] }",
                 "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
@@ -67,7 +67,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarComplexNumber() {
+    public void TestVarComplexNumber() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \"var\" : [\"challenger.height\"] }",
                 "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
@@ -77,7 +77,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarComplexNumber2() {
+    public void TestVarComplexNumber2() throws ParseException, EvaluationException {
         TestRunner(
                 "{ \">\" : [{ \"var\" : [\"champ.height\"] }, { \"var\" : [\"challenger.height\"] }] }",
                 "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
@@ -87,7 +87,7 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVarComplexNumber3() {
+    public void TestVarComplexNumber3() throws ParseException, EvaluationException {
         TestRunner(
                 "{\"and\" : [{ \">\" : [{ \"var\" : [\"champ.height\"] }, { \"var\" : [\"challenger.height\"] }] }, {\"==\" : [1,1]}] }",
                 "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",

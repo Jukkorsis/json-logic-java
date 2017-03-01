@@ -15,26 +15,14 @@
  */
 package com.northernwall.jsonLogic;
 
-import java.util.Map;
-
 /**
  *
  * @author Richard
  */
-class LessThanNode extends BinaryNode {
-
-    LessThanNode(Node left, Node right) {
-        super(left, right, " < ");
+public class ParseException extends Exception {
+    
+    public ParseException(String message, Throwable cause) {
+        super(message, cause);
     }
-
-    @Override
-    Result eval(Map<String, Result> data) throws EvaluationException {
-        Result leftResult = left.eval(data);
-        Result rightResult = right.eval(data);
-        if (leftResult.isLong() && rightResult.isLong()) {
-            return new Result(leftResult.getLongValue() < rightResult.getLongValue());
-        }
-        return null;
-    }
-
+    
 }
