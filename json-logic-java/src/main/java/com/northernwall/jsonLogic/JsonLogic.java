@@ -44,6 +44,11 @@ public class JsonLogic {
         return parse(rule).evaluate(data);
     }
 
+    /**
+     * Parses the rules into a reusable tree which can be evaluated many times.
+     * @param rule
+     * @return 
+     */
     public JsonLogicTree parse(String rule) {
         return new JsonLogicTree(parse(gson.newJsonReader(new StringReader(rule))), gson);
     }

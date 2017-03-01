@@ -32,14 +32,11 @@ public class JsonLogicTree {
         this.gson = gson;
     }
     
-    public void reduce() {
-        if (node.isConstant()) {
-            node = new ConstantNode(node.eval(new HashMap<>()));
-        } else {
-            node.reduce();
-        }
-    }
-    
+    /**
+     * Applies the value of data to the rules described in the tree to produce a result.
+     * @param data
+     * @return 
+     */
     public Result evaluate(String data) {
         return node.eval(convertData(data));
     }
@@ -50,10 +47,26 @@ public class JsonLogicTree {
             return temp;
         }
         
+        //todo replace
         temp.put("a", new Result("good"));
         return temp;
     }
     
+    /**
+     * This method tries to reduces the complexity of the tree by pruning sub-trees that produce a constant value regardless of the value of data.
+     */
+    public void reduce() {
+        if (node.isConstant()) {
+            node = new ConstantNode(node.eval(new HashMap<>()));
+        } else {
+            node.reduce();
+        }
+    }
+    
+    /**
+     * Produces the human readable text equivalent of the rules.
+     * @return 
+     */
     public String treeToString() {
         StringBuilder builder = new StringBuilder();
         node.treeToString(builder);

@@ -32,7 +32,7 @@ public abstract class Node {
     abstract boolean isConstant();
     
     /**
-     * reduce should only be called if isContant() returns false
+     * reduce() should only be called if isContant() returns false
      */
     void reduce() {
     }
