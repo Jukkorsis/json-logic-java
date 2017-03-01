@@ -15,25 +15,26 @@
  */
 package com.northernwall.jsonLogic;
 
-import org.junit.Test;
+import java.util.Map;
 
 /**
  *
  * @author Richard
  */
-public class SimpleVarTests extends BaseTest {
+class GreaterThanNode extends BinaryNode {
 
-    public SimpleVarTests() {
+    GreaterThanNode(Node left, Node right) {
+        super(left, right, " > ");
     }
 
-    @Test
-    public void TestVar() {
-        TestRunner(
-                "{ \"var\" : [\"a\"] }",
-                "{ \"a\" : \"good\", \"b\" : \"bad\" }",
-                "var->\"a\"",
-                "var->\"a\"",
-                "good");
+    @Override
+    Result eval(Map<String, Result> data) {
+        Result leftResult = left.eval(data);
+        Result rightResult = right.eval(data);
+        if (leftResult.isLong() && rightResult.isLong()) {
+            return new Result(leftResult.getLongValue() > rightResult.getLongValue());
+        }
+        return null;
     }
 
 }

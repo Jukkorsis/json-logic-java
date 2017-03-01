@@ -15,76 +15,65 @@
  */
 package com.northernwall.jsonLogic;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 /**
  *
  * @author Richard
  */
-public class SimpleLogicTests {
+public class SimpleLogicTests extends BaseTest {
 
     public SimpleLogicTests() {
     }
 
     @Test
     public void TestAndWithContants1() {
-        String rule = "{ \"and\" : [true, true] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{ \"and\" : [true, true] }",
+                null,
+                "(true && true)",
+                "true",
+                true);
     }
 
     @Test
     public void TestAndWithContants2() {
-        String rule = "{ \"and\" : [true, false] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{ \"and\" : [true, false] }",
+                null,
+                "(true && false)",
+                "false",
+                false);
     }
 
     @Test
     public void TestOrWithContants1() {
-        String rule = "{ \"or\" : [true, true] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{ \"or\" : [true, true] }",
+                null,
+                "(true || true)",
+                "true",
+                true);
     }
 
     @Test
     public void TestOrWithContants2() {
-        String rule = "{ \"or\" : [true, false] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{ \"or\" : [true, false] }",
+                null,
+                "(true || false)",
+                "true",
+                true);
     }
 
     @Test
     public void TestOrWithContants3() {
-        String rule = "{ \"or\" : [false, false] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{ \"or\" : [false, false] }",
+                null,
+                "(false || false)",
+                "false",
+                false);
     }
 
 }

@@ -15,25 +15,26 @@
  */
 package com.northernwall.jsonLogic;
 
-import org.junit.Test;
+import java.util.Map;
 
 /**
  *
  * @author Richard
  */
-public class SimpleVarTests extends BaseTest {
+class AndNode extends BinaryNode {
 
-    public SimpleVarTests() {
+    AndNode(Node left, Node right) {
+        super(left, right, " && ");
     }
 
-    @Test
-    public void TestVar() {
-        TestRunner(
-                "{ \"var\" : [\"a\"] }",
-                "{ \"a\" : \"good\", \"b\" : \"bad\" }",
-                "var->\"a\"",
-                "var->\"a\"",
-                "good");
+    @Override
+    Result eval(Map<String, Result> data) {
+        Result leftResult = left.eval(data);
+        Result rightResult = right.eval(data);
+        if (leftResult.isBoolean() && rightResult.isBoolean()) {
+            return new Result(leftResult.getBooleanValue() && rightResult.getBooleanValue());
+        }
+        return null;
     }
 
 }

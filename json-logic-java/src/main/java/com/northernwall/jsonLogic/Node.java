@@ -15,25 +15,28 @@
  */
 package com.northernwall.jsonLogic;
 
-import org.junit.Test;
+import java.util.Map;
 
 /**
  *
  * @author Richard
  */
-public class SimpleVarTests extends BaseTest {
+public abstract class Node {
 
-    public SimpleVarTests() {
+    abstract Result eval(Map<String, Result> data);
+    
+    /**
+     * If the result of calling eval is always the same regardless of the data parameter then this node is a constant.
+     * @return 
+     */
+    abstract boolean isConstant();
+    
+    /**
+     * reduce should only be called if isContant() returns false
+     */
+    void reduce() {
     }
 
-    @Test
-    public void TestVar() {
-        TestRunner(
-                "{ \"var\" : [\"a\"] }",
-                "{ \"a\" : \"good\", \"b\" : \"bad\" }",
-                "var->\"a\"",
-                "var->\"a\"",
-                "good");
-    }
+    abstract void treeToString(StringBuilder builder);
 
 }

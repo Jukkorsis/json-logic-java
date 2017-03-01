@@ -15,76 +15,65 @@
  */
 package com.northernwall.jsonLogic;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 /**
  *
  * @author Richard
  */
-public class SimpleCompareTests {
+public class SimpleCompareTests extends BaseTest {
 
     public SimpleCompareTests() {
     }
 
     @Test
     public void TestEqualsWithContants1() {
-        String rule = "{ \"==\" : [1, 1] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{ \"==\" : [1, 1] }",
+                null,
+                "(1 == 1)",
+                "true",
+                true);
     }
 
     @Test
     public void TestEqualsWithContants2() {
-        String rule = "{ \"==\" : [1, 3] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{ \"==\" : [1, 3] }",
+                null,
+                "(1 == 3)",
+                "false",
+                false);
     }
 
     @Test
     public void TestGreaterWithContants1() {
-        String rule = "{ \">\" : [3, 1] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{ \">\" : [3, 1] }",
+                null,
+                "(3 > 1)",
+                "true",
+                true);
     }
 
     @Test
     public void TestGreaterWithContants2() {
-        String rule = "{ \">\" : [1, 1] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{ \">\" : [1, 1] }",
+                null,
+                "(1 > 1)",
+                "false",
+                false);
     }
 
     @Test
     public void TestGreaterWithContants3() {
-        String rule = "{ \">\" : [1, 3] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{ \">\" : [1, 3] }",
+                null,
+                "(1 > 3)",
+                "false",
+                false);
     }
 
 }

@@ -15,25 +15,37 @@
  */
 package com.northernwall.jsonLogic;
 
-import org.junit.Test;
+import java.util.Map;
 
 /**
  *
  * @author Richard
  */
-public class SimpleVarTests extends BaseTest {
+class VarNode extends Node {
+    private final String name;
 
-    public SimpleVarTests() {
+    VarNode(String name) {
+        this.name = name;
     }
 
-    @Test
-    public void TestVar() {
-        TestRunner(
-                "{ \"var\" : [\"a\"] }",
-                "{ \"a\" : \"good\", \"b\" : \"bad\" }",
-                "var->\"a\"",
-                "var->\"a\"",
-                "good");
+    @Override
+    Result eval(Map<String, Result> data) {
+        if (data == null || data.isEmpty()) {
+            return JsonLogic.FALSE_RESULT;
+        }
+        return data.get(name);
+    }
+    
+    @Override
+    boolean isConstant() {
+        return false;
     }
 
+    @Override
+    void treeToString(StringBuilder builder) {
+        builder.append("var->\"");
+        builder.append(name);
+        builder.append("\"");
+    }
+    
 }

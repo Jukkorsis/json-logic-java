@@ -15,52 +15,75 @@
  */
 package com.northernwall.jsonLogic;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 /**
  *
  * @author Richard
  */
-public class ComplexTests {
+public class ComplexTests extends BaseTest {
 
     public ComplexTests() {
     }
 
     @Test
     public void TestAndWithContants1() {
-        String rule = "{\"and\" : [{\">\" : [3,1]}, {\"<\" : [1,3]}] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(true, result.getBooleanValue());
+        TestRunner(
+                "{\"and\" : [{\">\" : [3,1]}, {\"<\" : [1,3]}] }",
+                null,
+                "((3 > 1) && (1 < 3))",
+                "true",
+                true);
     }
 
     @Test
     public void TestAndWithContants2() {
-        String rule = "{\"and\" : [{\">\" : [4,5]}, {\"<\" : [1,3]}] }";
-        String data = null;
-
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+        TestRunner(
+                "{\"and\" : [{\">\" : [4,5]}, {\"<\" : [1,3]}] }",
+                null,
+                "((4 > 5) && (1 < 3))",
+                "false",
+                false);
     }
 
     @Test
     public void TestAndWithContants3() {
-        String rule = "{\"and\" : [{\">\" : [1,3]}, {\"<\" : [6,4]}] }";
-        String data = null;
+        TestRunner(
+                "{\"and\" : [{\">\" : [1,3]}, {\"<\" : [6,4]}] }",
+                null,
+                "((1 > 3) && (6 < 4))",
+                "false",
+                false);
+    }
 
-        JsonLogic jsonLogic = new JsonLogic();
-        
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(true, result.isBoolean());
-        Assert.assertEquals(false, result.getBooleanValue());
+    @Test
+    public void TestOrWithContants1() {
+        TestRunner(
+                "{\"or\" : [{\">\" : [3,1]}, {\"<\" : [1,3]}] }",
+                null,
+                "((3 > 1) || (1 < 3))",
+                "true",
+                true);
+    }
+
+    @Test
+    public void TestOrWithContants2() {
+        TestRunner(
+                "{\"or\" : [{\">\" : [4,5]}, {\"<\" : [1,3]}] }",
+                null,
+                "((4 > 5) || (1 < 3))",
+                "true",
+                true);
+    }
+
+    @Test
+    public void TestOrWithContants3() {
+        TestRunner(
+                "{\"or\" : [{\">\" : [2,7]}, {\"<\" : [6,4]}] }",
+                null,
+                "((2 > 7) || (6 < 4))",
+                "false",
+                false);
     }
 
 }

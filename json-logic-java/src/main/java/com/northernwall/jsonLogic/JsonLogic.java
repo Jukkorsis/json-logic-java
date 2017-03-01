@@ -23,175 +23,173 @@ import java.io.StringReader;
 
 public class JsonLogic {
 
+    static final Result TRUE_RESULT = new Result(true);
+    static final Result FALSE_RESULT = new Result(false);
+    static final ConstantNode TRUE_NODE = new ConstantNode(TRUE_RESULT);
+    static final ConstantNode FALSE_NODE = new ConstantNode(FALSE_RESULT);
+
     private final Gson gson;
 
     public JsonLogic() {
         gson = new Gson();
     }
 
+    /**
+     * Equivalent to "parse(rule).evaluate(data);"
+     * @param rule
+     * @param data
+     * @return 
+     */
     public Result apply(String rule, String data) {
-        JsonReader jsonRuleReader = gson.newJsonReader(new StringReader(rule));
-        return apply(jsonRuleReader, data);
+        return parse(rule).evaluate(data);
     }
 
-    private Result apply(JsonReader jsonRuleReader, String data) {
+    public JsonLogicTree parse(String rule) {
+        return new JsonLogicTree(parse(gson.newJsonReader(new StringReader(rule))), gson);
+    }
+    
+    private Node parse(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             switch (token) {
                 case BEGIN_OBJECT:
                     jsonRuleReader.beginObject();
                     String operation = jsonRuleReader.nextName();
-                    Result result = null;
                     switch (operation) {
                         case "==":
-                            result = processEquals(jsonRuleReader, data);
+                            tree = parseEquals(jsonRuleReader);
                             break;
                         case ">":
-                            result = processGreaterThan(jsonRuleReader, data);
+                            tree = parseGreaterThan(jsonRuleReader);
                             break;
                         case "<":
-                            result = processLessThan(jsonRuleReader, data);
+                            tree = parseLessThan(jsonRuleReader);
                             break;
                         case "and":
-                            result = processAnd(jsonRuleReader, data);
+                            tree = parseAnd(jsonRuleReader);
                             break;
                         case "or":
-                            result = processOr(jsonRuleReader, data);
+                            tree = parseOr(jsonRuleReader);
                             break;
                         case "var":
-                            result = processVar(jsonRuleReader, data);
+                            tree = parseVar(jsonRuleReader);
                             break;
                     }
                     jsonRuleReader.endObject();
-                    return result;
+                    break;
                 case NUMBER:
-                    return new Result(new Long(jsonRuleReader.nextLong()));
+                    tree = new ConstantNode(new Result(jsonRuleReader.nextLong()));
+                    break;
                 case BOOLEAN:
-                    return new Result(jsonRuleReader.nextBoolean());
-                default:
-                    return null;
+                    if (jsonRuleReader.nextBoolean()) {
+                        tree = TRUE_NODE;
+                    } else {
+                        tree = FALSE_NODE;
+                    }
+                    break;
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return tree;
     }
 
-    private Result processEquals(JsonReader jsonRuleReader, String data) {
+    private Node parseEquals(JsonReader jsonRuleReader) {
+        Node tree = null;
+        try {
+
+            JsonToken token = jsonRuleReader.peek();
+            if (token == JsonToken.BEGIN_ARRAY) {
+                jsonRuleReader.beginArray();
+                tree = new EqualsNode(parse(jsonRuleReader), parse(jsonRuleReader));
+                jsonRuleReader.endArray();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return tree;
+    }
+
+    private Node parseGreaterThan(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
                 jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
+                tree = new GreaterThanNode(parse(jsonRuleReader), parse(jsonRuleReader));
                 jsonRuleReader.endArray();
-                if (left.isBoolean() && right.isBoolean()) {
-                    return new Result(new Boolean(left.getBooleanValue() == right.getBooleanValue()));
-                }
-                if (left.isLong() && right.isLong()) {
-                    return new Result(new Boolean(left.getLongValue() == right.getLongValue()));
-                }
             }
-            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return tree;
     }
 
-    private Result processGreaterThan(JsonReader jsonRuleReader, String data) {
+    private Node parseLessThan(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
                 jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
+                tree = new LessThanNode(parse(jsonRuleReader), parse(jsonRuleReader));
                 jsonRuleReader.endArray();
-                if (left.isLong() && right.isLong()) {
-                    return new Result(new Boolean(left.getLongValue() > right.getLongValue()));
-                }
             }
-            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return tree;
     }
 
-    private Result processLessThan(JsonReader jsonRuleReader, String data) {
+    private Node parseAnd(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
                 jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
+                tree = new AndNode(parse(jsonRuleReader), parse(jsonRuleReader));
                 jsonRuleReader.endArray();
-                if (left.isLong() && right.isLong()) {
-                    return new Result(new Boolean(left.getLongValue() < right.getLongValue()));
-                }
             }
-            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return tree;
     }
 
-    private Result processAnd(JsonReader jsonRuleReader, String data) {
+    private Node parseOr(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
                 jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
+                tree = new OrNode(parse(jsonRuleReader), parse(jsonRuleReader));
                 jsonRuleReader.endArray();
-                if (left.isBoolean() && right.isBoolean()) {
-                    return new Result(new Boolean(left.getBooleanValue() && right.getBooleanValue()));
-                }
             }
-            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return tree;
     }
 
-    private Result processOr(JsonReader jsonRuleReader, String data) {
+    private Node parseVar(JsonReader jsonRuleReader) {
+        Node tree = null;
         try {
             JsonToken token = jsonRuleReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
                 jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
-                jsonRuleReader.endArray();
-                if (left.isBoolean() && right.isBoolean()) {
-                    return new Result(new Boolean(left.getBooleanValue() || right.getBooleanValue()));
+                String name = jsonRuleReader.nextString();
+                token = jsonRuleReader.peek();
+                if (token == JsonToken.END_ARRAY) {
+                    tree = new VarNode(name);
+                } else {
+                    //todo Process default value, second optional element in the array.
                 }
+                jsonRuleReader.endArray();
             }
-            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
         }
-    }
-
-    private Result processVar(JsonReader jsonRuleReader, String data) {
-        try {
-            JsonToken token = jsonRuleReader.peek();
-            if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                Result left = apply(jsonRuleReader, data);
-                Result right = apply(jsonRuleReader, data);
-                jsonRuleReader.endArray();
-                if (left.isBoolean() && right.isBoolean()) {
-                    return new Result(new Boolean(left.getBooleanValue() || right.getBooleanValue()));
-                }
-            }
-            return null;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        return tree;
     }
 
 }
