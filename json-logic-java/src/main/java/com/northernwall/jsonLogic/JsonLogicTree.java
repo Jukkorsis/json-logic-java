@@ -16,14 +16,21 @@
 package com.northernwall.jsonLogic;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Richard
  */
 public class JsonLogicTree {
+
     private Node node;
     private final Gson gson;
 
@@ -31,11 +38,13 @@ public class JsonLogicTree {
         this.node = node;
         this.gson = gson;
     }
-    
+
     /**
-     * Applies the value of data to the rules described in the tree to produce a result.
+     * Applies the value of data to the rules described in the tree to produce a
+     * result.
+     *
      * @param data
-     * @return 
+     * @return
      */
     public Result evaluate(String data) {
         return node.eval(convertData(data));
@@ -46,14 +55,50 @@ public class JsonLogicTree {
         if (data == null || data.isEmpty()) {
             return temp;
         }
-        
-        //todo replace
-        temp.put("a", new Result("good"));
+
+        try {
+            JsonReader jsonReader = gson.newJsonReader(new StringReader(data));
+            jsonReader.beginObject();
+            JsonToken token = jsonReader.peek();
+            while (token != JsonToken.END_OBJECT) {
+                String name = jsonReader.nextName();
+                readValue(name, jsonReader, temp);
+                token = jsonReader.peek();
+            }
+            jsonReader.endObject();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         return temp;
     }
-    
+
+    private void readValue(String name, JsonReader jsonReader, Map<String, Result> temp) throws IOException {
+        JsonToken token = jsonReader.peek();
+        switch (token) {
+            case NUMBER:
+                temp.put(name, new Result(jsonReader.nextLong()));
+                return;
+            case BOOLEAN:
+                temp.put(name, new Result(jsonReader.nextBoolean()));
+                return;
+            case STRING:
+                temp.put(name, new Result(jsonReader.nextString()));
+                return;
+            case BEGIN_OBJECT:
+                jsonReader.beginObject();
+                token = jsonReader.peek();
+                while (token != JsonToken.END_OBJECT) {
+                    String subName = jsonReader.nextName();
+                    readValue(name + "." + subName, jsonReader, temp);
+                    token = jsonReader.peek();
+                }
+                jsonReader.endObject();
+        }
+    }
+
     /**
-     * This method tries to reduces the complexity of the tree by pruning sub-trees that produce a constant value regardless of the value of data.
+     * This method tries to reduces the complexity of the tree by pruning
+     * sub-trees that produce a constant value regardless of the value of data.
      */
     public void reduce() {
         if (node.isConstant()) {
@@ -62,15 +107,16 @@ public class JsonLogicTree {
             node.reduce();
         }
     }
-    
+
     /**
      * Produces the human readable text equivalent of the rules.
-     * @return 
+     *
+     * @return
      */
     public String treeToString() {
         StringBuilder builder = new StringBuilder();
         node.treeToString(builder);
         return builder.toString();
     }
-    
+
 }

@@ -27,13 +27,73 @@ public class SimpleVarTests extends BaseTest {
     }
 
     @Test
-    public void TestVar() {
+    public void TestVarSimpleString() {
         TestRunner(
                 "{ \"var\" : [\"a\"] }",
-                "{ \"a\" : \"good\", \"b\" : \"bad\" }",
+                "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
                 "var->\"a\"",
                 "var->\"a\"",
                 "good");
+    }
+
+    @Test
+    public void TestVarSimpleBoolean() {
+        TestRunner(
+                "{ \"var\" : [\"b\"] }",
+                "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
+                "var->\"b\"",
+                "var->\"b\"",
+                true);
+    }
+
+    @Test
+    public void TestVarSimpleNumber() {
+        TestRunner(
+                "{ \"var\" : [\"c\"] }",
+                "{ \"a\" : \"good\", \"b\" : true, \"c\" : 42 }",
+                "var->\"c\"",
+                "var->\"c\"",
+                42);
+    }
+
+    @Test
+    public void TestVarComplexString() {
+        TestRunner(
+                "{ \"var\" : [\"champ.name\"] }",
+                "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
+                "var->\"champ.name\"",
+                "var->\"champ.name\"",
+                "Fezzig");
+    }
+
+    @Test
+    public void TestVarComplexNumber() {
+        TestRunner(
+                "{ \"var\" : [\"challenger.height\"] }",
+                "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
+                "var->\"challenger.height\"",
+                "var->\"challenger.height\"",
+                183);
+    }
+
+    @Test
+    public void TestVarComplexNumber2() {
+        TestRunner(
+                "{ \">\" : [{ \"var\" : [\"champ.height\"] }, { \"var\" : [\"challenger.height\"] }] }",
+                "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
+                "(var->\"champ.height\" > var->\"challenger.height\")",
+                "(var->\"champ.height\" > var->\"challenger.height\")",
+                true);
+    }
+
+    @Test
+    public void TestVarComplexNumber3() {
+        TestRunner(
+                "{\"and\" : [{ \">\" : [{ \"var\" : [\"champ.height\"] }, { \"var\" : [\"challenger.height\"] }] }, {\"==\" : [1,1]}] }",
+                "{\"champ\" : {\"name\" : \"Fezzig\",\"height\" : 223},\"challenger\" : {\"name\" : \"Dread Pirate Roberts\",\"height\" : 183}}",
+                "((var->\"champ.height\" > var->\"challenger.height\") && (1 == 1))",
+                "((var->\"champ.height\" > var->\"challenger.height\") && true)",
+                true);
     }
 
 }

@@ -28,6 +28,8 @@ public class BaseTest {
 
         Result result = jsonLogic.apply(rule, data);
         Assert.assertEquals(true, result.isBoolean());
+        Assert.assertEquals(false, result.isLong());
+        Assert.assertEquals(false, result.isString());
         Assert.assertEquals(expectedResult, result.getBooleanValue());
 
         JsonLogicTree tree = jsonLogic.parse(rule);
@@ -36,13 +38,37 @@ public class BaseTest {
         Assert.assertEquals(printReduced, tree.treeToString());
         result = tree.evaluate(data);
         Assert.assertEquals(true, result.isBoolean());
+        Assert.assertEquals(false, result.isLong());
+        Assert.assertEquals(false, result.isString());
         Assert.assertEquals(expectedResult, result.getBooleanValue());
+    }
+
+    protected void TestRunner(String rule, String data, String printFull, String printReduced, long expectedResult) {
+        JsonLogic jsonLogic = new JsonLogic();
+
+        Result result = jsonLogic.apply(rule, data);
+        Assert.assertEquals(false, result.isBoolean());
+        Assert.assertEquals(true, result.isLong());
+        Assert.assertEquals(false, result.isString());
+        Assert.assertEquals(expectedResult, result.getLongValue());
+
+        JsonLogicTree tree = jsonLogic.parse(rule);
+        Assert.assertEquals(printFull, tree.treeToString());
+        tree.reduce();
+        Assert.assertEquals(printReduced, tree.treeToString());
+        result = tree.evaluate(data);
+        Assert.assertEquals(false, result.isBoolean());
+        Assert.assertEquals(true, result.isLong());
+        Assert.assertEquals(false, result.isString());
+        Assert.assertEquals(expectedResult, result.getLongValue());
     }
 
     protected void TestRunner(String rule, String data, String printFull, String printReduced, String expectedResult) {
         JsonLogic jsonLogic = new JsonLogic();
 
         Result result = jsonLogic.apply(rule, data);
+        Assert.assertEquals(false, result.isBoolean());
+        Assert.assertEquals(false, result.isLong());
         Assert.assertEquals(true, result.isString());
         Assert.assertEquals(expectedResult, result.getStringValue());
 
@@ -51,6 +77,8 @@ public class BaseTest {
         tree.reduce();
         Assert.assertEquals(printReduced, tree.treeToString());
         result = tree.evaluate(data);
+        Assert.assertEquals(false, result.isBoolean());
+        Assert.assertEquals(false, result.isLong());
         Assert.assertEquals(true, result.isString());
         Assert.assertEquals(expectedResult, result.getStringValue());
     }

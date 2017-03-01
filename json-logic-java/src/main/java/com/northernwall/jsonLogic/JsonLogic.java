@@ -53,41 +53,41 @@ public class JsonLogic {
         return new JsonLogicTree(parse(gson.newJsonReader(new StringReader(rule))), gson);
     }
     
-    private Node parse(JsonReader jsonRuleReader) {
+    private Node parse(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             switch (token) {
                 case BEGIN_OBJECT:
-                    jsonRuleReader.beginObject();
-                    String operation = jsonRuleReader.nextName();
+                    jsonReader.beginObject();
+                    String operation = jsonReader.nextName();
                     switch (operation) {
                         case "==":
-                            tree = parseEquals(jsonRuleReader);
+                            tree = parseEquals(jsonReader);
                             break;
                         case ">":
-                            tree = parseGreaterThan(jsonRuleReader);
+                            tree = parseGreaterThan(jsonReader);
                             break;
                         case "<":
-                            tree = parseLessThan(jsonRuleReader);
+                            tree = parseLessThan(jsonReader);
                             break;
                         case "and":
-                            tree = parseAnd(jsonRuleReader);
+                            tree = parseAnd(jsonReader);
                             break;
                         case "or":
-                            tree = parseOr(jsonRuleReader);
+                            tree = parseOr(jsonReader);
                             break;
                         case "var":
-                            tree = parseVar(jsonRuleReader);
+                            tree = parseVar(jsonReader);
                             break;
                     }
-                    jsonRuleReader.endObject();
+                    jsonReader.endObject();
                     break;
                 case NUMBER:
-                    tree = new ConstantNode(new Result(jsonRuleReader.nextLong()));
+                    tree = new ConstantNode(new Result(jsonReader.nextLong()));
                     break;
                 case BOOLEAN:
-                    if (jsonRuleReader.nextBoolean()) {
+                    if (jsonReader.nextBoolean()) {
                         tree = TRUE_NODE;
                     } else {
                         tree = FALSE_NODE;
@@ -100,15 +100,15 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseEquals(JsonReader jsonRuleReader) {
+    private Node parseEquals(JsonReader jsonReader) {
         Node tree = null;
         try {
 
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                tree = new EqualsNode(parse(jsonRuleReader), parse(jsonRuleReader));
-                jsonRuleReader.endArray();
+                jsonReader.beginArray();
+                tree = new EqualsNode(parse(jsonReader), parse(jsonReader));
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -116,14 +116,14 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseGreaterThan(JsonReader jsonRuleReader) {
+    private Node parseGreaterThan(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                tree = new GreaterThanNode(parse(jsonRuleReader), parse(jsonRuleReader));
-                jsonRuleReader.endArray();
+                jsonReader.beginArray();
+                tree = new GreaterThanNode(parse(jsonReader), parse(jsonReader));
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -131,14 +131,14 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseLessThan(JsonReader jsonRuleReader) {
+    private Node parseLessThan(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                tree = new LessThanNode(parse(jsonRuleReader), parse(jsonRuleReader));
-                jsonRuleReader.endArray();
+                jsonReader.beginArray();
+                tree = new LessThanNode(parse(jsonReader), parse(jsonReader));
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -146,14 +146,14 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseAnd(JsonReader jsonRuleReader) {
+    private Node parseAnd(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                tree = new AndNode(parse(jsonRuleReader), parse(jsonRuleReader));
-                jsonRuleReader.endArray();
+                jsonReader.beginArray();
+                tree = new AndNode(parse(jsonReader), parse(jsonReader));
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -161,14 +161,14 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseOr(JsonReader jsonRuleReader) {
+    private Node parseOr(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                tree = new OrNode(parse(jsonRuleReader), parse(jsonRuleReader));
-                jsonRuleReader.endArray();
+                jsonReader.beginArray();
+                tree = new OrNode(parse(jsonReader), parse(jsonReader));
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -176,20 +176,20 @@ public class JsonLogic {
         return tree;
     }
 
-    private Node parseVar(JsonReader jsonRuleReader) {
+    private Node parseVar(JsonReader jsonReader) {
         Node tree = null;
         try {
-            JsonToken token = jsonRuleReader.peek();
+            JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
-                jsonRuleReader.beginArray();
-                String name = jsonRuleReader.nextString();
-                token = jsonRuleReader.peek();
+                jsonReader.beginArray();
+                String name = jsonReader.nextString();
+                token = jsonReader.peek();
                 if (token == JsonToken.END_ARRAY) {
                     tree = new VarNode(name);
                 } else {
                     //todo Process default value, second optional element in the array.
                 }
-                jsonRuleReader.endArray();
+                jsonReader.endArray();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
