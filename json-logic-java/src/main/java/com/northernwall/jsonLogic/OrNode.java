@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author Richard
  */
-class OrNode extends BinaryNode {
+class OrNode extends MultiNode {
 
     OrNode(Node left, Node right) {
         super(left, right, " || ");
@@ -29,12 +29,14 @@ class OrNode extends BinaryNode {
 
     @Override
     Result eval(Map<String, Result> data) throws EvaluationException {
-        Result leftResult = left.eval(data);
-        Result rightResult = right.eval(data);
-        if (leftResult.isBoolean() && rightResult.isBoolean()) {
-            return new Result(leftResult.getBooleanValue() || rightResult.getBooleanValue());
+        Result result = null;
+        for (Node node : nodes) {
+            result = node.eval(data);
+            if (result.isBoolean() && result.getBooleanValue()) {
+                return result;
+            }
         }
-        throw new EvaluationException("Both sides of an OR must be resolve to booleans");
+        return result;
     }
 
 }

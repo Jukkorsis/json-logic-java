@@ -48,7 +48,7 @@ public class Result {
     }
 
     public String getStringValue() {
-        return (String)value;
+        return value.toString();
     }
     
 }

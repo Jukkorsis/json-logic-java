@@ -1,0 +1,56 @@
+Equals with Constants
+{"==" : [1, 1]}	true
+{"==" : [1, 3]}	false
+
+Greater Than with Constants
+{">" : [3, 1]}	true
+{">" : [1, 1]}	false
+{">" : [1, 3]}	false
+
+Less Than with Constants
+{"<" : [2, 7]}	true
+{"<" : [2, 2]}	false
+{"<" : [7, 2]}	false
+
+Not with Contants
+{"!" : [true]}	false
+{"!" : [false]}	true
+{"!" : true}	false
+{"!" : false}	true
+
+And with Contants
+{"and" : [true, true]}	true
+{"and" : [true, false]}	false
+{"and" : [true, true, true]}	true
+{"and" : [true, true, false]}	false
+
+And with Compare
+{"and" : [{">" : [3,1]}, {"<" : [1,3]}]}	true
+{"and" : [{">" : [4,5]}, {"<" : [1,3]}]}	false
+{"and" : [{">" : [1,3]}, {"<" : [6,4]}]}	false
+{"and" : [{">" : [3,1]}, true, {"<" : [1,3]}]}	true
+
+Or with Contants
+{"or" : [true, true]}	true
+{"or" : [true, false]}	true
+{"or" : [false, false]}	false
+{"or" : [true, true, true]}	true
+{"or" : [true, false, true]}	true
+{"or" : [false, false, false]}	false
+
+Or with Compare
+{"or" : [{">" : [3,1]}, {"<" : [1,3]}]}	true
+{"or" : [{">" : [4,5]}, {"<" : [1,3]}]}	true
+{"or" : [{">" : [2,7]}, {"<" : [6,4]}]}	false
+{"or" : [{">" : [3,1]}, {"<" : [1,3]}, {"==" : [8, 8]}]}	true
+
+Simple Var
+{"var" : ["a"]}	{"a" : "good", "b" : true, "c" : 42}	good
+{"var" : ["b"]}	{"a" : "good", "b" : true, "c" : 42}	true
+{"var" : ["c"]}	{"a" : "good", "b" : true, "c" : 42}	42
+
+Var with dot notation attibutes
+{"var" : ["champ.name"]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	Fezzig
+{"var" : ["challenger.height"]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	183
+{">" : [{"var" : ["champ.height"]}, {"var" : ["challenger.height"]}]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	true
+{"and" : [{">" : [{"var" : ["champ.height"]}, {"var" : ["challenger.height"]}]}, {"==" : [1,1]}]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	true

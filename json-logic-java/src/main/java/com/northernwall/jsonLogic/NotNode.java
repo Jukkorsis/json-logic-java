@@ -21,22 +21,40 @@ import java.util.Map;
  *
  * @author Richard
  */
-class AndNode extends MultiNode {
+public class NotNode extends Node {
 
-    AndNode(Node left, Node right) {
-        super(left, right, " && ");
+    private Node node;
+
+    public NotNode(Node node) {
+        this.node = node;
     }
 
     @Override
     Result eval(Map<String, Result> data) throws EvaluationException {
-        Result result = null;
-        for (Node node : nodes) {
-            result = node.eval(data);
-            if (result.isBoolean() && !result.getBooleanValue()) {
-                return result;
-            }
+        Result result = node.eval(data);
+        if (result.isBoolean()) {
+            return new Result(!result.getBooleanValue());
         }
-        return result;
+        return null;
+    }
+
+    @Override
+    boolean isConstant() {
+        return node.isConstant();
+    }
+
+    @Override
+    void reduce() throws EvaluationException {
+        if (!(node instanceof ConstantNode)) {
+            node = new ConstantNode(node.eval(null));
+        }
+    }
+
+    @Override
+    void treeToString(StringBuilder builder) {
+        builder.append("not (");
+        node.treeToString(builder);
+        builder.append(")");
     }
 
 }

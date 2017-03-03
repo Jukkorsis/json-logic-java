@@ -36,10 +36,11 @@ public class JsonLogic {
 
     /**
      * Equivalent to "parse(rule).evaluate(data);"
+     *
      * @param rule
      * @param data
-     * @return 
-     * @throws com.northernwall.jsonLogic.ParseException 
+     * @return
+     * @throws com.northernwall.jsonLogic.ParseException
      */
     public Result apply(String rule, String data) throws ParseException, EvaluationException {
         return parse(rule).evaluate(data);
@@ -47,14 +48,15 @@ public class JsonLogic {
 
     /**
      * Parses the rules into a reusable tree which can be evaluated many times.
+     *
      * @param rule
-     * @return 
-     * @throws com.northernwall.jsonLogic.ParseException 
+     * @return
+     * @throws com.northernwall.jsonLogic.ParseException
      */
     public JsonLogicTree parse(String rule) throws ParseException {
         return new JsonLogicTree(parse(gson.newJsonReader(new StringReader(rule))), gson);
     }
-    
+
     private Node parse(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
@@ -78,6 +80,9 @@ public class JsonLogic {
                             break;
                         case "or":
                             tree = parseOr(jsonReader);
+                            break;
+                        case "!":
+                            tree = parseNot(jsonReader);
                             break;
                         case "var":
                             tree = parseVar(jsonReader);
@@ -149,28 +154,68 @@ public class JsonLogic {
     }
 
     private Node parseAnd(JsonReader jsonReader) throws ParseException {
-        Node tree = null;
+        AndNode andNode = null;
         try {
             JsonToken token = jsonReader.peek();
-            if (token == JsonToken.BEGIN_ARRAY) {
-                jsonReader.beginArray();
-                tree = new AndNode(parse(jsonReader), parse(jsonReader));
-                jsonReader.endArray();
+            if (null != token) {
+                switch (token) {
+                    case BEGIN_ARRAY:
+                        jsonReader.beginArray();
+                        andNode = new AndNode(parse(jsonReader), parse(jsonReader));
+                        while (jsonReader.peek() != JsonToken.END_ARRAY) {
+                            andNode.add(parse(jsonReader));
+                        }
+                        jsonReader.endArray();
+                        break;
+                }
             }
         } catch (IOException ex) {
             throw new ParseException(ex.getMessage(), ex);
         }
-        return tree;
+        return andNode;
     }
 
     private Node parseOr(JsonReader jsonReader) throws ParseException {
+        OrNode orNode = null;
+        try {
+            JsonToken token = jsonReader.peek();
+            if (null != token) {
+                switch (token) {
+                    case BEGIN_ARRAY:
+                        jsonReader.beginArray();
+                        orNode = new OrNode(parse(jsonReader), parse(jsonReader));
+                        while (jsonReader.peek() != JsonToken.END_ARRAY) {
+                            orNode.add(parse(jsonReader));
+                        }
+                        jsonReader.endArray();
+                        break;
+                    default:
+                        throw new ParseException("Expecting an array of two boolean expressions");
+                }
+            }
+        } catch (IOException ex) {
+            throw new ParseException(ex.getMessage(), ex);
+        }
+        return orNode;
+    }
+
+    private Node parseNot(JsonReader jsonReader) throws ParseException {
         Node tree = null;
         try {
             JsonToken token = jsonReader.peek();
-            if (token == JsonToken.BEGIN_ARRAY) {
-                jsonReader.beginArray();
-                tree = new OrNode(parse(jsonReader), parse(jsonReader));
-                jsonReader.endArray();
+            if (null != token) {
+                switch (token) {
+                    case BEGIN_ARRAY:
+                        jsonReader.beginArray();
+                        tree = new NotNode(parse(jsonReader));
+                        jsonReader.endArray();
+                        break;
+                    case BOOLEAN:
+                        tree = new NotNode(parse(jsonReader));
+                        break;
+                    default:
+                        throw new ParseException("Expecting a boolean or an array of one boolean");
+                }
             }
         } catch (IOException ex) {
             throw new ParseException(ex.getMessage(), ex);
@@ -186,24 +231,27 @@ public class JsonLogic {
                 jsonReader.beginArray();
                 String name = jsonReader.nextString();
                 token = jsonReader.peek();
-                if (null != token) switch (token) {
-                    case END_ARRAY:
-                        tree = new VarNode(name);
-                        break;
-                    case NUMBER:
-                        tree = new VarNode(name, new Result(jsonReader.nextLong()));
-                        break;
-                    case STRING:
-                        tree = new VarNode(name, new Result(jsonReader.nextString()));
-                        break;
-                    case BOOLEAN:
-                        if (jsonReader.nextBoolean()) {
-                            tree = new VarNode(name, TRUE_RESULT);
-                        } else {
-                            tree = new VarNode(name, FALSE_RESULT);
-                        }   break;
-                    default:
-                        break;
+                if (null != token) {
+                    switch (token) {
+                        case END_ARRAY:
+                            tree = new VarNode(name);
+                            break;
+                        case NUMBER:
+                            tree = new VarNode(name, new Result(jsonReader.nextLong()));
+                            break;
+                        case STRING:
+                            tree = new VarNode(name, new Result(jsonReader.nextString()));
+                            break;
+                        case BOOLEAN:
+                            if (jsonReader.nextBoolean()) {
+                                tree = new VarNode(name, TRUE_RESULT);
+                            } else {
+                                tree = new VarNode(name, FALSE_RESULT);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 jsonReader.endArray();
             }
