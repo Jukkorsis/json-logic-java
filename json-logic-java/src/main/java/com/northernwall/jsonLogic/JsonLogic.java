@@ -21,6 +21,11 @@ import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import java.io.StringReader;
 
+/**
+ * JsonLogic is used to parse and evaluate 'JsonLogic' expressions.
+ *
+ * @author Richard
+ */
 public class JsonLogic {
 
     static final Result TRUE_RESULT = new Result(true);
@@ -37,8 +42,8 @@ public class JsonLogic {
     /**
      * Equivalent to "parse(rule).evaluate(data);"
      *
-     * @param rule
-     * @param data
+     * @param rule A String containing a JsonLogic expression
+     * @param data A String containing JSON
      * @return
      * @throws com.northernwall.jsonLogic.ParseException
      */
@@ -49,7 +54,7 @@ public class JsonLogic {
     /**
      * Parses the rules into a reusable tree which can be evaluated many times.
      *
-     * @param rule
+     * @param rule A String containing a JsonLogic expression
      * @return
      * @throws com.northernwall.jsonLogic.ParseException
      */
@@ -84,14 +89,22 @@ public class JsonLogic {
                         case "!":
                             tree = parseNot(jsonReader);
                             break;
+                        case "if":
+                            tree = parseIf(jsonReader);
+                            break;
                         case "var":
                             tree = parseVar(jsonReader);
                             break;
+                        default:
+                            throw new ParseException("Unknown operation '" + operation + "'");
                     }
                     jsonReader.endObject();
                     break;
                 case NUMBER:
                     tree = new ConstantNode(new Result(jsonReader.nextLong()));
+                    break;
+                case STRING:
+                    tree = new ConstantNode(new Result(jsonReader.nextString()));
                     break;
                 case BOOLEAN:
                     if (jsonReader.nextBoolean()) {
@@ -223,8 +236,26 @@ public class JsonLogic {
         return tree;
     }
 
+    private Node parseIf(JsonReader jsonReader) throws ParseException {
+        IfNode ifNode = null;
+        try {
+            JsonToken token = jsonReader.peek();
+            if (token == JsonToken.BEGIN_ARRAY) {
+                jsonReader.beginArray();
+                ifNode = new IfNode(parse(jsonReader), parse(jsonReader), parse(jsonReader));
+                while (jsonReader.peek() != JsonToken.END_ARRAY) {
+                    ifNode.addConditionNode(parse(jsonReader), parse(jsonReader));
+                }
+                jsonReader.endArray();
+            }
+        } catch (IOException ex) {
+            throw new ParseException(ex.getMessage(), ex);
+        }
+        return ifNode;
+    }
+
     private Node parseVar(JsonReader jsonReader) throws ParseException {
-        Node tree = null;
+        Node node = null;
         try {
             JsonToken token = jsonReader.peek();
             if (token == JsonToken.BEGIN_ARRAY) {
@@ -234,19 +265,19 @@ public class JsonLogic {
                 if (null != token) {
                     switch (token) {
                         case END_ARRAY:
-                            tree = new VarNode(name);
+                            node = new VarNode(name);
                             break;
                         case NUMBER:
-                            tree = new VarNode(name, new Result(jsonReader.nextLong()));
+                            node = new VarNode(name, new Result(jsonReader.nextLong()));
                             break;
                         case STRING:
-                            tree = new VarNode(name, new Result(jsonReader.nextString()));
+                            node = new VarNode(name, new Result(jsonReader.nextString()));
                             break;
                         case BOOLEAN:
                             if (jsonReader.nextBoolean()) {
-                                tree = new VarNode(name, TRUE_RESULT);
+                                node = new VarNode(name, TRUE_RESULT);
                             } else {
-                                tree = new VarNode(name, FALSE_RESULT);
+                                node = new VarNode(name, FALSE_RESULT);
                             }
                             break;
                         default:
@@ -254,11 +285,14 @@ public class JsonLogic {
                     }
                 }
                 jsonReader.endArray();
+            } else if (token == JsonToken.STRING) {
+                String name = jsonReader.nextString();
+                node = new VarNode(name);
             }
         } catch (IOException ex) {
             throw new ParseException(ex.getMessage(), ex);
         }
-        return tree;
+        return node;
     }
 
 }

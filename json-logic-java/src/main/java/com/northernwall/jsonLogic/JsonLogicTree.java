@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * JsonLogicTree is a reusable representation of a 'JsonLogic' expression.
  *
  * @author Richard
  */
@@ -41,7 +42,7 @@ public class JsonLogicTree {
      * Applies the value of data to the rules described in the tree to produce a
      * result.
      *
-     * @param data
+     * @param data A String containing JSON
      * @return
      */
     public Result evaluate(String data) throws ParseException, EvaluationException {
@@ -96,7 +97,7 @@ public class JsonLogicTree {
 
     /**
      * This method tries to reduces the complexity of the tree by pruning
-     * sub-trees that produce a constant value regardless of the value of data.
+     * sub-trees that produce a constant value regardless of the variable data.
      */
     public void reduce() throws EvaluationException {
         if (node.isConstant()) {

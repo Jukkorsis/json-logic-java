@@ -21,11 +21,11 @@ import java.util.Map;
  *
  * @author Richard
  */
-public class NotNode extends Node {
+class NotNode extends Node {
 
     private Node node;
 
-    public NotNode(Node node) {
+    NotNode(Node node) {
         this.node = node;
     }
 
