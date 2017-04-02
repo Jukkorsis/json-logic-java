@@ -1,56 +1,144 @@
-Equals with Constants
+#Equals with Constants
 {"==" : [1, 1]}	true
 {"==" : [1, 3]}	false
+{"==" : [1, "1"]}	true
+{"==" : [0, false]}	true
 
-Greater Than with Constants
-{">" : [3, 1]}	true
-{">" : [1, 1]}	false
-{">" : [1, 3]}	false
+#Strict Equals with Constants
+{"===" : [1, 1]}	true
+{"===" : [1, "1"]}	false
 
-Less Than with Constants
-{"<" : [2, 7]}	true
-{"<" : [2, 2]}	false
-{"<" : [7, 2]}	false
+#Not Equals with Constants
+{"!=" : [1, 2]}	true
+{"!=" : [1, "1"]}	false
 
-Not with Contants
+#Strict Not Equals with Constants
+{"!==" : [1, 2]}	true
+{"!==" : [1, "1"]}	true
+
+#Not with Constants
 {"!" : [true]}	false
 {"!" : [false]}	true
 {"!" : true}	false
 {"!" : false}	true
 
-And with Contants
+#Greater Than with Constants
+{">" : [3, 1]}	true
+{">" : [1, 1]}	false
+{">" : [1, 3]}	false
+
+#Greater Than Or Equal with Constants
+{">=" : [8, 7]}	true
+{">=" : [8, 8]}	true
+{">=" : [8, 9]}	false
+
+#Less Than with Constants
+{"<" : [2, 7]}	true
+{"<" : [2, 2]}	false
+{"<" : [7, 2]}	false
+
+#Less Than Or Equal with Constants
+{"<=" : [7, 6]}	false
+{"<=" : [7, 7]}	true
+{"<=" : [7, 8]}	true
+
+#Between
+{"<" : [1, 2, 3]}	true
+{"<" : [1, 1, 3]}	true
+{"<" : [1, 3, 3]}	false
+{"<=" : [1, 2, 3]}	true
+{"<=" : [1, 1, 3]}	true
+{"<=" : [1, 0, 3]}	false
+{"<=" : [1, 4, 3]}	false
+{ "<": [0, {"var":"temp"}, 100]}	{"temp" : 37}	true
+
+#And with Constants
 {"and" : [true, true]}	true
 {"and" : [true, false]}	false
 {"and" : [true, true, true]}	true
 {"and" : [true, true, false]}	false
+{"and" : [true, "a", 3]}	3
+{"and" : [true, "", 3]}	
 
-And with Compare
+#And with Compare
 {"and" : [{">" : [3,1]}, {"<" : [1,3]}]}	true
 {"and" : [{">" : [4,5]}, {"<" : [1,3]}]}	false
 {"and" : [{">" : [1,3]}, {"<" : [6,4]}]}	false
 {"and" : [{">" : [3,1]}, true, {"<" : [1,3]}]}	true
 
-Or with Contants
+#Or with Constants
 {"or" : [true, true]}	true
 {"or" : [true, false]}	true
 {"or" : [false, false]}	false
 {"or" : [true, true, true]}	true
 {"or" : [true, false, true]}	true
 {"or" : [false, false, false]}	false
+{"or" : [false, "a"]}	a
+{"or" : [false, 0, "a"]}	a
 
-Or with Compare
+#Or with Compare
 {"or" : [{">" : [3,1]}, {"<" : [1,3]}]}	true
 {"or" : [{">" : [4,5]}, {"<" : [1,3]}]}	true
 {"or" : [{">" : [2,7]}, {"<" : [6,4]}]}	false
 {"or" : [{">" : [3,1]}, {"<" : [1,3]}, {"==" : [8, 8]}]}	true
 
-Simple Var
+#Min and Max
+{"max":[1,2,3]}	3
+{"min":[1,2,3]}	1
+
+#Arithmetic
+{"+":[4,2]}	6
+{"+":[2,2,2,2,2]}	10
+{"+":"3.14"}	3.14
+{"-":[4,2]}	2
+{"-":[2]}	-2
+{"-":[-2]}	2
+{"*":[4,2]}	8
+{"*":[2,2,2,2,2]}	32
+{"/":[4,2]}	2
+{"%":[101,2]}	1
+
+#Simple Var
+{"var" : "a"}	{"a" : "good", "b" : true, "c" : 42}	good
 {"var" : ["a"]}	{"a" : "good", "b" : true, "c" : 42}	good
-{"var" : ["b"]}	{"a" : "good", "b" : true, "c" : 42}	true
+{"var" : "b"}	{"a" : "good", "b" : true, "c" : 42}	true
 {"var" : ["c"]}	{"a" : "good", "b" : true, "c" : 42}	42
 
-Var with dot notation attibutes
+#Var with dot notation attributes
 {"var" : ["champ.name"]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	Fezzig
 {"var" : ["challenger.height"]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	183
 {">" : [{"var" : ["champ.height"]}, {"var" : ["challenger.height"]}]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	true
 {"and" : [{">" : [{"var" : ["champ.height"]}, {"var" : ["challenger.height"]}]}, {"==" : [1,1]}]}	{"champ" : {"name" : "Fezzig","height" : 223},"challenger" : {"name" : "Dread Pirate Roberts","height" : 183}}	true
+
+#Var with default value
+{"var":["z", 26]}	{"a":1,"b":2}	26
+{"var":["z", "good"]}	{"a":1,"b":2}	good
+{"var":["z", true]}	{"a":1,"b":2}	true
+
+#if operator
+{"if" : [ true, "yes", "no" ]}	yes
+{"if" : [ false, "yes", "no" ]}	no
+{"if" : [{"<": [{"var":"temp"}, 0]}, "freezing", {"<": [{"var":"temp"}, 100]}, "liquid", "gas"]}	{"temp":55}	liquid
+
+#Missing operator
+{"missing":["a", "b"]}	{"a":"apple", "b":"banana", "c":"carrot"}	[]
+{"missing":["a", "b"]}	{"a":"apple", "c":"carrot"}	["b"]
+{"missing":["a", "b", "c", "d"]}	{"a":"apple", "c":"carrot"}	["b","d"]
+{"if":[{"missing":["a", "b"]},"Not enough fruit","OK to proceed"]}	{"a":"apple", "b":"banana", "c":"carrot"}	OK to proceed
+
+#Array Operations
+{"merge":[ [1,2], [3,4] ]}	[1,2,3,4]
+{"merge":[ 1, 2, [3,4] ]}	[1,2,3,4]
+{"missing" :{ "merge" : ["vin",{"if": [{"var":"financing"}, ["apr", "term"], [] ]}]}}	{"financing":true}	["vin","apr","term"]
+{"missing" :{ "merge" : ["vin",{"if": [{"var":"financing"}, ["apr", "term"], [] ]}]}}	{"financing":false}	["vin"]
+
+#in operator
+{"in":[ "Ringo", ["John", "Paul", "George", "Ringo"] ]}	true
+{"in":["Spring", "Springfield"]}	true
+
+#Cat operator
+{"cat": ["I love", " pie"]}	I love pie
+{"cat": ["I love ", {"var":"filling"}, " pie"]}	{"filling":"apple", "temp":110}	I love apple pie
+
+#log to console
+{"log":"apple"}	apple

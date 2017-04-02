@@ -17,7 +17,6 @@ package com.northernwall.jsonLogic;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import junit.framework.Assert;
@@ -29,6 +28,11 @@ import org.junit.Test;
  */
 public class BulkTests {
 
+    private int lineNumber = 1;
+    private String line;
+    private int passCount = 0;
+    private int failCount = 0;
+
     public BulkTests() {
     }
 
@@ -39,39 +43,52 @@ public class BulkTests {
 
             InputStream stream = new FileInputStream("BulkTests.txt");
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            int lineNumber = 1;
-            while (runTest(jsonLogic, reader, lineNumber++)) {
+
+            line = reader.readLine();
+            while (line != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    if (line.startsWith("#")) {
+                        System.out.println(line);
+                    } else {
+                        runTest(jsonLogic);
+                    }
+                }
+                line = reader.readLine();
+                lineNumber = lineNumber + 1;
             }
-            System.out.println();
-        } catch (IOException ex) {
+            if (failCount > 0) {
+                Assert.fail(failCount
+                        + " failed tests, "
+                        + passCount
+                        + " passed tests, "
+                        + (failCount + passCount)
+                        + " total tests.");
+            } else {
+                System.out.println("All "
+                        + passCount
+                        + " tests passed!");
+            }
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private boolean runTest(JsonLogic jsonLogic, BufferedReader reader, int lineNumber) throws IOException, ParseException, EvaluationException {
-        String line = reader.readLine();
-        if (line == null) {
-            return false;
-        }
-        line = line.trim();
-        if (line.isEmpty()) {
-            return true;
+    private void runTest(JsonLogic jsonLogic) {
+        String[] parts = line.split("\t");
+        if (parts.length < 2) {
+            printError("test format is illegal");
+            failCount++;
+            return;
         }
 
-        String[] parts = line.split("\t");
-        if (parts.length == 1) {
-            System.out.println();
-            System.out.println("Bulk Tests: " + parts[0]);
-            return true;
-        }
-        System.out.print(lineNumber + " ");
-        
-        String rule = null;
-        String data = null;
-        String expectedResult = null;
+        String rule;
+        String data;
+        String expectedResult;
 
         if (parts.length == 2) {
             rule = parts[0];
+            data = null;
             expectedResult = parts[1];
         } else {
             rule = parts[0];
@@ -79,15 +96,57 @@ public class BulkTests {
             expectedResult = parts[2];
         }
 
-        Result result = jsonLogic.apply(rule, data);
-        Assert.assertEquals(expectedResult, result.getStringValue());
+        try {
+            Result result = jsonLogic.apply(rule, data);
+            if (!checkResult(expectedResult, result)) {
+                return;
+            }
 
-        JsonLogicTree tree = jsonLogic.parse(rule);
-        tree.reduce();
-        result = tree.evaluate(data);
-        Assert.assertEquals(expectedResult, result.getStringValue());
+            JsonLogicTree tree = jsonLogic.parse(rule);
+            result = tree.evaluate(data);
+            if (!checkResult(expectedResult, result)) {
+                return;
+            }
 
+            tree.reduce();
+            result = tree.evaluate(data);
+            if (!checkResult(expectedResult, result)) {
+                return;
+            }
+        } catch (Exception e) {
+            printError(e.getClass().getSimpleName()
+                    + ": "
+                    + e.getMessage());
+            failCount++;
+            return;
+        }
+        passCount++;
+    }
+
+    private boolean checkResult(String expectedResult, Result result) {
+        if (result == null) {
+            printError("result is null");
+            failCount++;
+            return false;
+        }
+        if (!expectedResult.equals(result.getStringValue())) {
+            printError("expecting "
+                    + expectedResult
+                    + " but actual result is "
+                    + result.getStringValue());
+            failCount++;
+            return false;
+        }
         return true;
+    }
+
+    private void printError(String message) {
+        System.out.println("  Error on line "
+                + lineNumber
+                + " - "
+                + message);
+        System.out.println("    "
+                + line);
     }
 
 }
