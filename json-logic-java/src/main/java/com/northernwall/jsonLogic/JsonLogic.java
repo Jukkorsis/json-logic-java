@@ -95,6 +95,9 @@ public class JsonLogic {
                         case "var":
                             tree = parseVar(jsonReader);
                             break;
+                        case "log":
+                            tree = parseLog(jsonReader);
+                            break;
                         default:
                             throw new ParseException("Unknown operation '" + operation + "'");
                     }
@@ -293,6 +296,14 @@ public class JsonLogic {
             throw new ParseException(ex.getMessage(), ex);
         }
         return node;
+    }
+
+    private Node parseLog(JsonReader jsonReader) throws ParseException {
+        try {
+            return new LogNode(parse(jsonReader));
+       } catch (Exception ex) {
+            throw new ParseException(ex.getMessage(), ex);
+        }
     }
 
 }
